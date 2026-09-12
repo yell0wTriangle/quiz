@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f172a" />
+    <title>IT Questions Quiz</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">ITQUES</p>
+          <h1>Practice quiz</h1>
+        </div>
+        <div class="header-actions">
+          <span id="progressText" class="progress-text" aria-live="polite"></span>
+          <button id="themeToggle" class="button button-secondary theme-toggle" type="button" aria-pressed="false">🌙 Dark</button>
+          <button id="resetButton" class="button button-secondary" type="button">Start fresh</button>
+        </div>
+      </header>
+
+      <section class="filter-panel" aria-labelledby="topicHeading">
+        <div class="filter-title">
+          <div>
+            <p class="eyebrow">Topics</p>
+            <h2 id="topicHeading">Choose what to practice</h2>
+          </div>
+          <div class="filter-actions">
+            <button id="selectAllButton" class="text-button" type="button">Select all</button>
+            <button id="clearTopicsButton" class="text-button" type="button">Clear</button>
+          </div>
+        </div>
+        <div id="topicFilters" class="topic-filters"></div>
+        <p id="filterHint" class="filter-hint"></p>
+      </section>
+
+      <div class="quiz-layout">
+        <aside class="question-nav" aria-label="Question navigator">
+          <div class="navigator-heading">
+            <div>
+              <h2>Question overview</h2>
+              <p id="navigatorSummary" class="navigator-summary"></p>
+            </div>
+            <span id="navigatorCount"></span>
+          </div>
+          <div id="questionGrid" class="question-grid"></div>
+          <p class="legend"><i class="correct"></i> Right <i class="wrong"></i> Wrong <i class="unanswered"></i> Unanswered <i class="current"></i> Current</p>
+        </aside>
+
+        <section class="question-card" aria-live="polite">
+          <div class="question-meta">
+            <span id="questionNumber" class="pill"></span>
+            <span id="questionTopic" class="topic-name"></span>
+          </div>
+          <h2 id="questionText"></h2>
+          <div id="options" class="options" role="radiogroup" aria-label="Answer options"></div>
+          <p id="answerFeedback" class="answer-feedback" aria-live="polite"></p>
+          <div class="navigation-actions">
+            <button id="previousButton" class="button button-secondary" type="button">Previous</button>
+            <button id="nextButton" class="button button-primary" type="button">Next question</button>
+          </div>
+        </section>
+      </div>
+    </main>
+    <dialog id="resetDialog" class="reset-dialog">
+      <h2>Start a new quiz?</h2>
+      <p>This clears your saved answers and creates a newly shuffled quiz.</p>
+      <div class="dialog-actions">
+        <button id="cancelResetButton" class="button button-secondary" type="button">Cancel</button>
+        <button id="confirmResetButton" class="button button-danger" type="button">Start fresh</button>
+      </div>
+    </dialog>
+    <script src="questions.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
