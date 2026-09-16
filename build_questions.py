@@ -4,7 +4,7 @@ from pathlib import Path
 
 from openpyxl import load_workbook
 
-SOURCE = Path("PhonePe_Debit_Analysis.xlsx")
+SOURCE = Path("IT Questions (1).xlsx")
 SHEET = "IT Questions for Quiz"
 TARGET = Path("questions.js")
 
@@ -40,7 +40,7 @@ if any(not item["topic"] or not item["question"] or len(item["options"]) < 2 or 
     raise SystemExit("The workbook contains incomplete quiz rows.")
 
 TARGET.write_text(
-    "// Generated from PhonePe_Debit_Analysis.xlsx. Run build_questions.py after updating the workbook.\n"
+    "// Generated from IT Questions (1).xlsx. Run build_questions.py after updating the workbook.\n"
     + "window.QUIZ_QUESTIONS = "
     + json.dumps(questions, ensure_ascii=False, separators=(",", ":"))
     + ";\n",
