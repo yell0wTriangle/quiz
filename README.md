@@ -1,6 +1,6 @@
 # ITQUES quiz
 
-A static, responsive quiz built from the `IT Questions for Quiz` worksheet in `IT Questions (1).xlsx`. It has no database or server-side code.
+A static, responsive quiz built from the `IT Questions for Quiz` worksheet in `IT Questions (2).xlsx`. It has no database or server-side code.
 
 - Questions randomize when a new browser session starts.
 - Answers, topic choices, and the current question survive page refreshes in the same tab through `sessionStorage`.
@@ -14,4 +14,4 @@ A static, responsive quiz built from the `IT Questions for Quiz` worksheet in `I
 3. Leave the framework preset as **Other** and the build command blank.
 4. Deploy. Vercel serves `index.html` directly; no environment variables or database are required.
 
-To update the question bank later, replace or edit `IT Questions (1).xlsx`, run `python build_questions.py`, and redeploy the generated `questions.js`.
+To update the question bank later, replace or edit `IT Questions (2).xlsx`, run `python build_questions.py`, and redeploy the generated `questions.js`.
