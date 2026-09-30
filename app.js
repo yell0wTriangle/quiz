@@ -5,10 +5,10 @@
   const byId = new Map(questions.map((question) => [question.id, question]));
   const $ = (selector) => document.querySelector(selector);
   const elements = {
-    filters: $("#topicFilters"), grid: $("#questionGrid"), questionNumber: $("#questionNumber"),
+    filters: $("#topicFilters"), questionNumber: $("#questionNumber"),
     topic: $("#questionTopic"), question: $("#questionText"), options: $("#options"), feedback: $("#answerFeedback"),
-    previous: $("#previousButton"), next: $("#nextButton"), progress: $("#progressText"), navigatorCount: $("#navigatorCount"), navigatorSummary: $("#navigatorSummary"),
-    hint: $("#filterHint"), resetDialog: $("#resetDialog"), themeToggle: $("#themeToggle"), source: $("#sourceSelect")
+    previous: $("#previousButton"), next: $("#nextButton"), progress: $("#progressText"),
+    hint: $("#filterHint"), resetDialog: $("#resetDialog"), filterDialog: $("#filterDialog"), themeToggle: $("#themeToggle"), source: $("#sourceSelect")
   };
   const topicsFor = (source) => [...new Set(questions.filter((question) => question.source === source).map((question) => question.topic))].sort();
   const shuffle = (items) => {
@@ -50,16 +50,6 @@
       state.current = 0; save(); render();
     }));
   }
-  function renderGrid(order) {
-    elements.grid.innerHTML = order.map((id, index) => {
-      const selected = state.answers[id];
-      const question = byId.get(id);
-      const result = selected ? (selected === question.answer ? "is-correct" : "is-wrong") : "is-unanswered";
-      const resultLabel = selected ? (result === "is-correct" ? "correct" : "incorrect") : "unanswered";
-      return `<button class="grid-button ${result} ${index === state.current ? "is-current" : ""}" type="button" data-index="${index}" aria-label="Question ${index + 1}, ${resultLabel}" aria-current="${index === state.current ? "step" : "false"}"><span>${index + 1}</span><span class="grid-status" aria-hidden="true">${selected ? (result === "is-correct" ? "✓" : "×") : ""}</span></button>`;
-    }).join("");
-    elements.grid.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => setCurrent(Number(button.dataset.index))));
-  }
   function renderQuestion(question, order) {
     if (!question) {
       elements.questionNumber.textContent = "No topics selected"; elements.topic.textContent = "";
@@ -90,10 +80,8 @@
     const answered = order.filter((id) => state.answers[id]).length;
     const correct = order.filter((id) => state.answers[id] === byId.get(id).answer).length;
     const wrong = answered - correct;
-    renderFilters(); renderGrid(order); renderQuestion(currentQuestion(), order);
+    renderFilters(); renderQuestion(currentQuestion(), order);
     elements.progress.textContent = `${answered} answered · ${correct} right · ${wrong} wrong`;
-    elements.navigatorCount.textContent = `${order.length} total`;
-    elements.navigatorSummary.textContent = answered ? `${correct} right · ${wrong} wrong · ${order.length - answered} left` : "Tap a number to jump to any question";
     elements.hint.textContent = state.topics.length ? `${order.length} question${order.length === 1 ? "" : "s"} selected. Your progress stays saved in this browser tab after refresh.` : "Choose at least one topic to show questions.";
   }
   elements.previous.addEventListener("click", () => setCurrent(state.current - 1));
@@ -101,6 +89,8 @@
   $("#selectAllButton").addEventListener("click", () => { state.topics = topicsFor(state.source); state.current = 0; save(); render(); });
   $("#clearTopicsButton").addEventListener("click", () => { state.topics = []; state.current = 0; save(); render(); });
   $("#resetButton").addEventListener("click", () => elements.resetDialog.showModal());
+  $("#openFiltersButton").addEventListener("click", () => elements.filterDialog.showModal());
+  $("#closeFiltersButton").addEventListener("click", () => elements.filterDialog.close());
   $("#cancelResetButton").addEventListener("click", () => elements.resetDialog.close());
   $("#confirmResetButton").addEventListener("click", () => { state = newState(); save(); elements.resetDialog.close(); render(); });
   elements.themeToggle.addEventListener("click", () => setTheme(document.body.classList.contains("theme-dark") ? "light" : "dark"));
