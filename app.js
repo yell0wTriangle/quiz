@@ -1,16 +1,16 @@
 (() => {
-  const STORE_KEY = "itques-quiz-v1";
+  const STORE_KEY = "itques-quiz-v2";
   const THEME_KEY = "itques-theme-v1";
   const questions = window.QUIZ_QUESTIONS;
-  const byId = new Map(questions.map((question) => [question.number, question]));
+  const byId = new Map(questions.map((question) => [question.id, question]));
   const $ = (selector) => document.querySelector(selector);
   const elements = {
     filters: $("#topicFilters"), grid: $("#questionGrid"), questionNumber: $("#questionNumber"),
     topic: $("#questionTopic"), question: $("#questionText"), options: $("#options"), feedback: $("#answerFeedback"),
     previous: $("#previousButton"), next: $("#nextButton"), progress: $("#progressText"), navigatorCount: $("#navigatorCount"), navigatorSummary: $("#navigatorSummary"),
-    hint: $("#filterHint"), resetDialog: $("#resetDialog"), themeToggle: $("#themeToggle")
+    hint: $("#filterHint"), resetDialog: $("#resetDialog"), themeToggle: $("#themeToggle"), source: $("#sourceSelect")
   };
-  const topics = [...new Set(questions.map((question) => question.topic))].sort();
+  const topicsFor = (source) => [...new Set(questions.filter((question) => question.source === source).map((question) => question.topic))].sort();
   const shuffle = (items) => {
     const copy = [...items];
     for (let index = copy.length - 1; index > 0; index -= 1) {
@@ -19,11 +19,11 @@
     }
     return copy;
   };
-  const newState = () => ({ order: shuffle(questions.map((question) => question.number)), topics, answers: {}, current: 0 });
+  const newState = () => ({ source: "pdf", order: shuffle(questions.filter((question) => question.source === "pdf").map((question) => question.id)), topics: topicsFor("pdf"), answers: {}, current: 0 });
   const load = () => {
     try {
       const saved = JSON.parse(sessionStorage.getItem(STORE_KEY));
-      if (saved && Array.isArray(saved.order) && saved.order.length === questions.length) return saved;
+      if (saved && ["pdf", "book"].includes(saved.source) && Array.isArray(saved.order)) return saved;
     } catch (_) { /* A new state is safer than a broken one. */ }
     return newState();
   };
@@ -38,11 +38,12 @@
   };
   const savedTheme = (() => { try { return localStorage.getItem(THEME_KEY); } catch (_) { return null; } })();
   setTheme(savedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
-  const visibleOrder = () => state.order.filter((id) => state.topics.includes(byId.get(id).topic));
+  const visibleOrder = () => state.order.filter((id) => byId.has(id) && byId.get(id).source === state.source && state.topics.includes(byId.get(id).topic));
   const currentQuestion = () => byId.get(visibleOrder()[state.current]);
   const setCurrent = (index) => { state.current = Math.max(0, Math.min(index, visibleOrder().length - 1)); save(); render(); };
 
   function renderFilters() {
+    const topics = topicsFor(state.source);
     elements.filters.innerHTML = topics.map((topic) => `<label class="topic-check"><input type="checkbox" value="${topic}" ${state.topics.includes(topic) ? "checked" : ""}>${topic}</label>`).join("");
     elements.filters.querySelectorAll("input").forEach((input) => input.addEventListener("change", () => {
       state.topics = [...elements.filters.querySelectorAll("input:checked")].map((item) => item.value);
@@ -65,9 +66,10 @@
       elements.question.textContent = "Select at least one topic to begin."; elements.options.innerHTML = ""; elements.feedback.textContent = "";
       elements.previous.disabled = elements.next.disabled = true; return;
     }
-    const selected = state.answers[question.number];
+    const selected = state.answers[question.id];
     elements.questionNumber.textContent = `Question ${state.current + 1} of ${order.length}`;
-    elements.topic.textContent = question.topic; elements.question.textContent = question.question;
+    elements.topic.textContent = question.topic;
+    elements.question.textContent = question.question;
     elements.options.innerHTML = question.options.map((option, index) => {
       const letter = String.fromCharCode(65 + index); const correct = question.answer === letter;
       const classes = selected ? (correct ? "is-correct" : selected === letter ? "is-wrong" : "") : "";
@@ -81,7 +83,7 @@
     } else { elements.feedback.textContent = ""; elements.feedback.className = "answer-feedback"; }
     elements.previous.disabled = state.current === 0; elements.next.disabled = state.current === order.length - 1;
   }
-  function answer(question, letter) { state.answers[question.number] = letter; save(); render(); }
+  function answer(question, letter) { state.answers[question.id] = letter; save(); render(); }
   function render() {
     if (state.current >= visibleOrder().length) state.current = 0;
     const order = visibleOrder();
@@ -96,11 +98,17 @@
   }
   elements.previous.addEventListener("click", () => setCurrent(state.current - 1));
   elements.next.addEventListener("click", () => setCurrent(state.current + 1));
-  $("#selectAllButton").addEventListener("click", () => { state.topics = [...topics]; state.current = 0; save(); render(); });
+  $("#selectAllButton").addEventListener("click", () => { state.topics = topicsFor(state.source); state.current = 0; save(); render(); });
   $("#clearTopicsButton").addEventListener("click", () => { state.topics = []; state.current = 0; save(); render(); });
   $("#resetButton").addEventListener("click", () => elements.resetDialog.showModal());
   $("#cancelResetButton").addEventListener("click", () => elements.resetDialog.close());
   $("#confirmResetButton").addEventListener("click", () => { state = newState(); save(); elements.resetDialog.close(); render(); });
   elements.themeToggle.addEventListener("click", () => setTheme(document.body.classList.contains("theme-dark") ? "light" : "dark"));
+  elements.source.value = state.source;
+  elements.source.addEventListener("change", () => {
+    state.source = elements.source.value;
+    state.order = shuffle(questions.filter((question) => question.source === state.source).map((question) => question.id));
+    state.topics = topicsFor(state.source); state.current = 0; save(); render();
+  });
   render();
 })();
