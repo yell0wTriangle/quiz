@@ -56,9 +56,14 @@
       </dialog>
 
       <div class="quiz-layout">
+        <aside class="question-grid-panel" aria-labelledby="questionGridHeading">
+          <h2 id="questionGridHeading">Questions</h2>
+          <div id="questionGrid" class="question-grid"></div>
+          <div class="question-grid-legend"><span><i class="grid-dot unanswered"></i>Unattempted</span><span><i class="grid-dot correct"></i>Correct</span><span><i class="grid-dot wrong"></i>Wrong</span></div>
+        </aside>
         <section class="question-card" aria-live="polite">
           <div class="question-meta">
-            <span id="questionNumber" class="pill"></span>
+            <button id="questionNumber" class="pill question-number-button" type="button" aria-haspopup="dialog" aria-controls="questionGridDialog"></button>
             <span id="questionTopic" class="topic-name"></span>
           </div>
           <div class="question-prompt"><h2 id="questionText"></h2></div>
@@ -71,6 +76,11 @@
         </section>
       </div>
     </main>
+    <dialog id="questionGridDialog" class="question-grid-dialog" aria-labelledby="mobileQuestionGridHeading">
+      <div class="question-grid-dialog-header"><h2 id="mobileQuestionGridHeading">Choose a question</h2><button id="closeQuestionGridButton" class="button button-secondary" type="button">Done</button></div>
+      <div id="mobileQuestionGrid" class="question-grid"></div>
+      <div class="question-grid-legend"><span><i class="grid-dot unanswered"></i>Unattempted</span><span><i class="grid-dot correct"></i>Correct</span><span><i class="grid-dot wrong"></i>Wrong</span></div>
+    </dialog>
     <dialog id="resetDialog" class="reset-dialog">
       <h2>Start a new quiz?</h2>
       <p>This clears your saved answers and creates a newly shuffled quiz.</p>

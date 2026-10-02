@@ -10,6 +10,8 @@
     previous: $("#previousButton"), next: $("#nextButton"), progress: $("#progressText"),
     hint: $("#filterHint"), resetDialog: $("#resetDialog"), filterDialog: $("#filterDialog"), themeToggle: $("#themeToggle"), source: $("#sourceSelect")
   };
+  const questionGridDialog = $("#questionGridDialog");
+  const gridContainers = [$("#questionGrid"), $("#mobileQuestionGrid")];
   const topicsFor = (source) => [...new Set(questions.filter((question) => question.source === source).map((question) => question.topic))].sort();
   const shuffle = (items) => {
     const copy = [...items];
@@ -52,12 +54,13 @@
   }
   function renderQuestion(question, order) {
     if (!question) {
-      elements.questionNumber.textContent = "No topics selected"; elements.topic.textContent = "";
+      elements.questionNumber.textContent = "No topics selected"; elements.questionNumber.disabled = true; elements.topic.textContent = "";
       elements.question.textContent = "Select at least one topic to begin."; elements.options.innerHTML = ""; elements.feedback.textContent = "";
       elements.previous.disabled = elements.next.disabled = true; return;
     }
+    elements.questionNumber.disabled = false;
     const selected = state.answers[question.id];
-    elements.questionNumber.textContent = `Question ${state.current + 1} of ${order.length}`;
+    elements.questionNumber.textContent = `Question ${state.current + 1} out of ${order.length}`;
     elements.topic.textContent = question.topic;
     elements.question.textContent = question.question;
     elements.options.innerHTML = question.options.map((option, index) => {
@@ -73,6 +76,20 @@
     } else { elements.feedback.textContent = ""; elements.feedback.className = "answer-feedback"; }
     elements.previous.disabled = state.current === 0; elements.next.disabled = state.current === order.length - 1;
   }
+  function renderQuestionGrid(order) {
+    gridContainers.forEach((container) => {
+      container.innerHTML = order.map((id, index) => {
+        const question = byId.get(id);
+        const selected = state.answers[id];
+        const status = !selected ? "unanswered" : selected === question.answer ? "correct" : "wrong";
+        return `<button class="question-grid-item ${status} ${index === state.current ? "is-current" : ""}" type="button" data-index="${index}" aria-label="Question ${index + 1}, ${status === "unanswered" ? "unattempted" : status}" aria-current="${index === state.current ? "step" : "false"}">${index + 1}</button>`;
+      }).join("");
+      container.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => {
+        setCurrent(Number(button.dataset.index));
+        if (questionGridDialog.open) questionGridDialog.close();
+      }));
+    });
+  }
   function answer(question, letter) { state.answers[question.id] = letter; save(); render(); }
   function render() {
     if (state.current >= visibleOrder().length) state.current = 0;
@@ -80,7 +97,7 @@
     const answered = order.filter((id) => state.answers[id]).length;
     const correct = order.filter((id) => state.answers[id] === byId.get(id).answer).length;
     const wrong = answered - correct;
-    renderFilters(); renderQuestion(currentQuestion(), order);
+    renderFilters(); renderQuestion(currentQuestion(), order); renderQuestionGrid(order);
     elements.progress.textContent = `${answered} answered · ${correct} right · ${wrong} wrong`;
     elements.hint.textContent = state.topics.length ? `${order.length} question${order.length === 1 ? "" : "s"} selected. Your progress stays saved in this browser tab after refresh.` : "Choose at least one topic to show questions.";
   }
@@ -90,6 +107,8 @@
   $("#clearTopicsButton").addEventListener("click", () => { state.topics = []; state.current = 0; save(); render(); });
   $("#resetButton").addEventListener("click", () => elements.resetDialog.showModal());
   $("#openFiltersButton").addEventListener("click", () => elements.filterDialog.showModal());
+  elements.questionNumber.addEventListener("click", () => { if (visibleOrder().length) questionGridDialog.showModal(); });
+  $("#closeQuestionGridButton").addEventListener("click", () => questionGridDialog.close());
   $("#closeFiltersButton").addEventListener("click", () => elements.filterDialog.close());
   $("#cancelResetButton").addEventListener("click", () => elements.resetDialog.close());
   $("#confirmResetButton").addEventListener("click", () => { state = newState(); save(); elements.resetDialog.close(); render(); });
