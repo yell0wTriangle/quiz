@@ -1,6 +1,6 @@
 # ITQUES quiz
 
-A static, responsive quiz with separate PDF and book question banks. The **PDF questions** section is generated from the `IT Questions for Quiz` worksheet in `pdf ques.xlsx`; **Book questions** comes from the `Book Questions` worksheet in `book ques.xlsx`.
+A static, responsive quiz with separate PDF and book question banks. The **PDF questions** section is generated from the `IT Questions for Quiz` worksheet in `pdf_new.xlsx`; **Book questions** comes from the `Book Questions` worksheet in `book_new.xlsx`.
 
 - Questions randomize when a new browser session starts and when switching sections.
 - Topic filters apply within the selected section.
@@ -15,4 +15,4 @@ A static, responsive quiz with separate PDF and book question banks. The **PDF q
 3. Leave the framework preset as **Other** and the build command blank.
 4. Deploy. Vercel serves `index.html` directly; no environment variables or database are required.
 
-To update the question banks, edit `pdf ques.xlsx` or `book ques.xlsx`, run `python build_questions.py`, and redeploy the generated `questions.js`.
+To update the question banks, edit `pdf_new.xlsx` or `book_new.xlsx`, run `python build_questions.py`, and redeploy the generated `questions.js`.

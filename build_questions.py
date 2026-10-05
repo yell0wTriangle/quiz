@@ -5,8 +5,8 @@ from pathlib import Path
 from openpyxl import load_workbook
 
 SOURCES = [
-    ("itquesupdated.xlsx", "IT Questions for Quiz", "pdf"),
-    ("bookquesupdated.xlsx", "Book Questions", "book"),
+    ("pdf_new.xlsx", "IT Questions for Quiz", "pdf_new"),
+    ("book_new.xlsx", "Book Questions", "book_new"),
 ]
 TARGET = Path("questions.js")
 
@@ -44,7 +44,7 @@ for filename, sheet_name, source in SOURCES:
     workbook.close()
 
 TARGET.write_text(
-    "// Generated from itquesupdated.xlsx and bookquesupdated.xlsx. Run build_questions.py after updating either workbook.\n"
+    "// Generated from pdf_new.xlsx and book_new.xlsx. Run build_questions.py after updating either workbook.\n"
     + "window.QUIZ_QUESTIONS = "
     + json.dumps(questions, ensure_ascii=False, separators=(",", ":"))
     + ";\n",

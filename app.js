@@ -1,5 +1,5 @@
 (() => {
-  const STORE_KEY = "itques-quiz-v2";
+  const STORE_KEY = "itques-quiz-v3";
   const THEME_KEY = "itques-theme-v1";
   const questions = window.QUIZ_QUESTIONS;
   const byId = new Map(questions.map((question) => [question.id, question]));
@@ -21,11 +21,11 @@
     }
     return copy;
   };
-  const newState = () => ({ source: "pdf", order: shuffle(questions.filter((question) => question.source === "pdf").map((question) => question.id)), topics: topicsFor("pdf"), answers: {}, current: 0 });
+  const newState = () => ({ source: "pdf_new", order: shuffle(questions.filter((question) => question.source === "pdf_new").map((question) => question.id)), topics: topicsFor("pdf_new"), answers: {}, current: 0 });
   const load = () => {
     try {
       const saved = JSON.parse(sessionStorage.getItem(STORE_KEY));
-      if (saved && ["pdf", "book"].includes(saved.source) && Array.isArray(saved.order)) return saved;
+      if (saved && ["pdf_new", "book_new"].includes(saved.source) && Array.isArray(saved.order)) return saved;
     } catch (_) { /* A new state is safer than a broken one. */ }
     return newState();
   };
